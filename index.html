@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DA Team · 주간 트래픽 리포트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  background:#EEF2F7;
+  color:#0F172A;
+  font-size:14px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+
+/* ── HEADER ── */
+.site-header{
+  background:#0D1B2A;
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{
+  max-width:1140px;margin:0 auto;padding:0 28px;
+  height:62px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-badge{
+  font-size:10px;font-weight:800;letter-spacing:3px;
+  color:#0D1B2A;background:#60A5FA;
+  padding:4px 9px;border-radius:4px;
+}
+.brand-title{font-size:15px;font-weight:700;color:#F1F5F9}
+.brand-sub{font-size:12px;color:#64748B;font-weight:500}
+
+.header-right{display:flex;align-items:center;gap:12px}
+.week-nav{display:flex;align-items:center;gap:6px}
+.nav-btn{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:#94A3B8;width:32px;height:32px;border-radius:7px;
+  cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;font-family:inherit;
+}
+.nav-btn:hover{background:rgba(255,255,255,.18);color:#fff}
+.week-info{text-align:center}
+.week-label{font-size:14px;font-weight:700;color:#F1F5F9;display:block;line-height:1.3}
+.week-dates-str{font-size:11px;color:#64748B;display:block}
+.fetch-btn{
+  background:#1D4ED8;border:none;color:#fff;font-size:13px;font-weight:700;
+  font-family:inherit;padding:9px 20px;border-radius:8px;cursor:pointer;
+  transition:background .15s;white-space:nowrap;
+}
+.fetch-btn:hover{background:#1E40AF}
+.fetch-btn:disabled{background:#1E3A5F;color:#64748B;cursor:not-allowed}
+
+.progress-track{height:3px;background:rgba(255,255,255,.06)}
+.progress-fill{height:100%;background:#3B82F6;width:0%;transition:width .4s ease}
+.status-bar-text{
+  max-width:1140px;margin:0 auto;padding:5px 28px;
+  font-size:11px;color:#64748B;height:24px;display:flex;align-items:center;gap:8px;
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#3B82F6;flex-shrink:0;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── MAIN ── */
+.main{max-width:1140px;margin:0 auto;padding:28px 28px 80px}
+
+/* ── KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{
+  background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+  padding:22px 24px;position:relative;overflow:hidden;
+}
+.kpi-card::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--kpi-color,#1D4ED8);border-radius:0;
+}
+.kpi-label{font-size:11px;font-weight:800;color:#64748B;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.kpi-value{font-size:30px;font-weight:800;color:#0F172A;line-height:1;margin-bottom:10px}
+.kpi-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;
+}
+.kpi-badge.up{background:#DCFCE7;color:#15803D}
+.kpi-badge.dn{background:#FEE2E2;color:#B91C1C}
+.kpi-badge.na{background:#F1F5F9;color:#64748B}
+.kpi-vs{font-size:11px;color:#94A3B8;font-weight:500;margin-top:4px}
+
+/* ── SECTION ── */
+.section{
+  background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+  padding:28px;margin-bottom:20px;
+}
+.section-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px}
+.section-title{font-size:17px;font-weight:800;color:#0F172A}
+.section-note{font-size:12px;color:#64748B;font-weight:600}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+
+/* ── CHART ── */
+.chart-wrap{position:relative;width:100%;height:280px}
+.chart-wrap.md{height:240px}
+.chart-wrap.sm{height:200px}
+.legend-row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F1F5F9}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#475569}
+.leg-line{width:22px;height:3px;border-radius:2px;flex-shrink:0}
+.leg-line.dashed{
+  background:repeating-linear-gradient(90deg,#94A3B8 0,#94A3B8 5px,transparent 5px,transparent 8px);
+  background-color:transparent!important;
+}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── ANOMALY ── */
+.anomaly-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.anomaly-chip{
+  font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;
+  display:flex;align-items:center;gap:5px;
+}
+.anomaly-chip.spike{background:#FEF9C3;color:#92400E;border:1px solid #FDE68A}
+.anomaly-chip.drop{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
+.anomaly-chip.ok{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{
+  font-size:12px;font-weight:700;color:#475569;
+  padding:9px 14px;border-bottom:2px solid #E2E8F0;
+  text-align:right;white-space:nowrap;
+}
+.data-table th:first-child{text-align:left}
+.data-table td{
+  font-size:13px;font-weight:600;color:#0F172A;
+  padding:11px 14px;border-bottom:1px solid #F1F5F9;
+  text-align:right;white-space:nowrap;
+}
+.data-table td:first-child{text-align:left;font-weight:800}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#FAFBFF}
+
+/* ── DEVICE BAR ── */
+.dev-bar-wrap{margin-bottom:18px}
+.dev-bar-label{
+  display:flex;justify-content:space-between;
+  font-size:12px;font-weight:700;color:#475569;margin-bottom:6px;
+}
+.dev-bar-track{height:10px;background:#F1F5F9;border-radius:10px;overflow:hidden;display:flex}
+.dev-bar-mobile{height:100%;background:#1D4ED8;border-radius:10px 0 0 10px;transition:width .6s}
+.dev-bar-pc{height:100%;background:#94A3B8;border-radius:0 10px 10px 0;transition:width .6s}
+
+/* ── SIM INFO ── */
+.sim-info-box{
+  background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;
+  padding:13px 18px;font-size:13px;color:#1E40AF;font-weight:700;
+  margin-bottom:18px;display:flex;align-items:center;gap:10px;
+}
+
+/* ── AI SECTION ── */
+.ai-btn{
+  background:#0D1B2A;color:#fff;border:none;font-family:inherit;
+  font-size:13px;font-weight:700;padding:11px 22px;border-radius:9px;
+  cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:8px;
+}
+.ai-btn:hover{background:#1E293B}
+.ai-btn:disabled{background:#94A3B8;cursor:not-allowed}
+.ai-result-box{
+  background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;
+  padding:22px 26px;min-height:90px;margin-top:16px;
+}
+.ai-placeholder{color:#94A3B8;font-size:13px;text-align:center;padding:20px 0}
+.ai-text{
+  font-size:14px;font-weight:500;color:#1E293B;line-height:1.95;
+  white-space:pre-wrap;
+}
+.ai-spinner-row{display:flex;align-items:center;gap:12px;color:#64748B;font-size:13px;font-weight:600}
+.spin{
+  width:20px;height:20px;border:2.5px solid #E2E8F0;
+  border-top-color:#1D4ED8;border-radius:50%;
+  animation:rot .7s linear infinite;
+}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ── FOOTER ── */
+.site-footer{
+  text-align:center;padding:16px 28px 40px;
+  font-size:12px;color:#94A3B8;
+}
+
+/* ── EMPTY ── */
+.empty-state{
+  text-align:center;padding:40px 20px;color:#94A3B8;
+  font-size:13px;font-weight:600;
+}
+
+
+
+/* ── KPI COMMENT ── */
+.kpi-comment{
+  font-size:11px;font-weight:600;color:#475569;
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid #F1F5F9;
+  line-height:1.6;min-height:0;
+}
+.kpi-comment:empty{display:none}
+
+
+/* ── INSIGHT BOX ── */
+.insight-box{
+  background:#F0F9FF;border-left:3px solid #0EA5E9;border-radius:0 8px 8px 0;
+  padding:11px 16px;font-size:13px;font-weight:700;color:#0C4A6E;
+  margin-bottom:16px;line-height:1.6;
+}
+
+/* ── COLLAPSIBLE ── */
+.toggle-hd{cursor:pointer;user-select:none}
+.toggle-hd:hover .section-title{color:#1D4ED8}
+.toggle-icon{font-size:11px;color:#94A3B8;transition:transform .25s;display:inline-block}
+.section-body{transition:none}
+.section-body.collapsed{display:none}
+.toggle-icon.collapsed{transform:rotate(180deg)}
+
+/* ── PRINT ── */
+@media print{
+  body{background:#fff}
+  .site-header{position:static}
+  .section,.kpi-card{break-inside:avoid;box-shadow:none}
+  .ai-btn,.fetch-btn,.nav-btn{display:none}
+}
+@page{size:A4;margin:14mm 16mm}
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .header-inner{flex-wrap:wrap;height:auto;padding:12px 16px;gap:10px}
+}
+
+/* ── PASSWORD GATE ── */
+#pwGate{
+  position:fixed;inset:0;z-index:9999;
+  background:#EEF2F7;
+  display:flex;align-items:center;justify-content:center;
+}
+.pw-box{
+  width:100%;max-width:380px;padding:44px 40px;
+  background:#fff;border:1px solid #E2E8F0;border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+}
+.pw-badge{
+  font-size:10px;font-weight:800;letter-spacing:3px;
+  color:#0D1B2A;background:#60A5FA;
+  padding:4px 10px;border-radius:4px;margin-bottom:22px;
+}
+.pw-title{font-size:20px;font-weight:800;color:#0F172A;margin-bottom:6px;text-align:center}
+.pw-sub{font-size:13px;color:#64748B;font-weight:600;margin-bottom:28px;text-align:center;line-height:1.6}
+.pw-input{
+  width:100%;padding:13px 16px;
+  background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:10px;
+  color:#0F172A;font-size:15px;font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  font-weight:700;letter-spacing:3px;outline:none;text-align:center;
+  margin-bottom:12px;transition:border-color .2s;
+}
+.pw-input:focus{border-color:#3B82F6;background:#fff}
+.pw-input::placeholder{color:#94A3B8;letter-spacing:0;font-weight:500;font-size:14px}
+.pw-btn{
+  width:100%;padding:13px;background:#0D1B2A;border:none;border-radius:10px;
+  color:#fff;font-size:14px;font-weight:800;font-family:inherit;
+  cursor:pointer;transition:background .15s;margin-bottom:10px;
+}
+.pw-btn:hover{background:#1E293B}
+.pw-err{
+  font-size:12px;font-weight:700;color:#DC2626;
+  min-height:18px;text-align:center;
+}
+</style>
+</head>
+<body>
+
+<div id="pwGate">
+  <div class="pw-box">
+    <span class="pw-badge">DA TEAM</span>
+    <div class="pw-title">주간 트래픽 리포트</div>
+    <div class="pw-sub">AI &amp; 데이터팀 · 박현경<br>접근 비밀번호를 입력하세요</div>
+    <div style="position:relative;width:100%;margin-bottom:12px">
+      <input class="pw-input" id="pwInput" type="password" placeholder="비밀번호 입력" autocomplete="off" maxlength="30" style="margin-bottom:0;padding-right:44px">
+      <button id="pwToggle" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;color:#64748B;display:flex;align-items:center" title="비밀번호 보기">
+        <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <button class="pw-btn" id="pwSubmit">입장하기</button>
+    <div class="pw-err" id="pwErr"></div>
+  </div>
+</div>
+
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-badge">DA TEAM</span>
+      <div>
+        <span class="brand-title">주간 트래픽 리포트</span>
+        <span class="brand-sub" id="reportSubtitle"></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="week-nav">
+        <button class="nav-btn" id="prevBtn" title="이전 주">&#8592;</button>
+        <div class="week-info">
+          <span class="week-label" id="weekLabel">—</span>
+          <span class="week-dates-str" id="weekDatesStr">날짜를 선택하세요</span>
+        </div>
+        <button class="nav-btn" id="nextBtn" title="다음 주">&#8594;</button>
+      </div>
+      <button class="fetch-btn" id="fetchBtn">데이터 불러오기</button>
+    </div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="status-bar-text" id="statusText"></div>
+</header>
+
+<main class="main">
+
+  <!-- 크레딧 -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;color:#64748B">
+      <span style="background:#0D1B2A;color:#60A5FA;font-size:10px;font-weight:800;letter-spacing:2px;padding:3px 8px;border-radius:4px;margin-right:8px">DA TEAM</span>
+      AI&amp;데이터팀 박현경
+    </div>
+    <div style="font-size:12px;color:#94A3B8;font-weight:500" id="reportDate"></div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card" style="--kpi-color:#1D4ED8">
+      <div class="kpi-label">전체 PV</div>
+      <div class="kpi-value" id="kv-pv">—</div>
+      <span class="kpi-badge na" id="kb-pv">전주 비교 대기</span>
+      <div class="kpi-vs" id="ks-pv"></div>
+      <div class="kpi-comment" id="kc-pv"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#0891B2">
+      <div class="kpi-label">전체 방문자 (BC)</div>
+      <div class="kpi-value" id="kv-vis">—</div>
+      <span class="kpi-badge na" id="kb-vis">전주 비교 대기</span>
+      <div class="kpi-vs" id="ks-vis"></div>
+      <div class="kpi-comment" id="kc-vis"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#7C3AED">
+      <div class="kpi-label">모바일 PV 비중</div>
+      <div class="kpi-value" id="kv-mob">—</div>
+      <span class="kpi-badge na" id="kb-mob">전주 비교 대기</span>
+      <div class="kpi-vs" id="ks-mob"></div>
+      <div class="kpi-comment" id="kc-mob"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#059669">
+      <div class="kpi-label">UV (순방문자)</div>
+      <div class="kpi-value" id="kv-uv">—</div>
+      <span class="kpi-badge na" id="kb-uv">전주 비교 대기</span>
+      <div class="kpi-vs" id="ks-uv"></div>
+      <div class="kpi-comment" id="kc-uv"></div>
+    </div>
+  </div>
+
+  <!-- 일별 PV 추이 -->
+  <section class="section">
+    <div class="section-hd">
+      <span class="section-title">일별 PV 추이</span>
+      <span class="section-note">실선 = 이번 주 / 점선 = 전주 동일 요일 · 노란 칩 = 4주 평균 대비 ±15% 이상 이탈</span>
+    </div>
+    <div class="legend-row" id="pvLegend">
+      <span class="leg-item"><span class="leg-line" style="background:#1D4ED8"></span>이번 주</span>
+      <span class="leg-item"><span class="leg-line dashed"></span>전주</span>
+    </div>
+    <div class="anomaly-row" id="anomalyRow">
+      <span class="anomaly-chip ok">이상 탐지 준비 중</span>
+    </div>
+    <div class="chart-wrap"><canvas id="pvTrendChart" role="img" aria-label="일별 PV 추이 차트"></canvas></div>
+  </section>
+
+  <!-- 디바이스 + 채널 -->
+  <div class="two-col">
+
+    <!-- 디바이스 분포 -->
+    <section class="section">
+      <div class="section-hd">
+        <span class="section-title">디바이스 분포</span>
+        <span class="section-note">파란 바 = 모바일 / 회색 바 = PC · 가로 막대는 비중, 차트는 일별 추이</span>
+      </div>
+      <div id="devBars">
+        <div class="dev-bar-wrap">
+          <div class="dev-bar-label"><span>PV 모바일</span><span id="devPvMobPct">—</span></div>
+          <div class="dev-bar-track">
+            <div class="dev-bar-mobile" id="devPvMobBar" style="width:0%"></div>
+            <div class="dev-bar-pc" id="devPvPcBar" style="width:0%"></div>
+          </div>
+          <div class="dev-bar-label" style="color:#94A3B8;font-weight:500;margin-top:4px">
+            <span>모바일 <span id="devPvMobVal">—</span></span>
+            <span>PC <span id="devPvPcVal">—</span></span>
+          </div>
+        </div>
+        <div class="dev-bar-wrap">
+          <div class="dev-bar-label"><span>방문자 모바일</span><span id="devVisMobPct">—</span></div>
+          <div class="dev-bar-track">
+            <div class="dev-bar-mobile" id="devVisMobBar" style="width:0%"></div>
+            <div class="dev-bar-pc" id="devVisPcBar" style="width:0%"></div>
+          </div>
+          <div class="dev-bar-label" style="color:#94A3B8;font-weight:500;margin-top:4px">
+            <span>모바일 <span id="devVisMobVal">—</span></span>
+            <span>PC <span id="devVisPcVal">—</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrap sm" style="margin-top:16px"><canvas id="deviceChart" role="img" aria-label="디바이스별 PV 비중 차트"></canvas></div>
+    </section>
+
+    <!-- 유입채널 포털 3사 -->
+    <section class="section">
+      <div class="section-hd">
+        <span class="section-title">유입채널 · 포털 3사</span>
+        <span class="section-note">포털 3사 유입 방문자(BC) · 표 = 전주 비교 / 차트 = 일별 유입 흐름</span>
+      </div>
+      <div class="insight-box" id="channelInsight" style="display:none"></div>
+      <table class="data-table" id="channelTable">
+        <thead>
+          <tr>
+            <th>채널</th>
+            <th>이번 주</th>
+            <th>전주</th>
+            <th>변화</th>
+          </tr>
+        </thead>
+        <tbody id="channelTbody">
+          <tr><td colspan="4" class="empty-state">데이터를 불러오세요</td></tr>
+        </tbody>
+      </table>
+      <div class="chart-wrap sm" style="margin-top:20px">
+        <canvas id="channelChart" role="img" aria-label="채널별 방문자 추이 차트"></canvas>
+      </div>
+    </section>
+  </div>
+
+  <!-- 차주 시뮬레이션 -->
+  <section class="section">
+    <div class="section-hd">
+      <span class="section-title">차주 PV 시뮬레이션</span>
+      <span class="section-note">보라 점선 = 차주 예측값 / 연보라 범위 = ±1σ (과거 4주 요일 편차) · 파란 참고선 = 이번 주 실제</span>
+    </div>
+    <div class="sim-info-box" id="simInfoBox">
+      데이터 로드 후 시뮬레이션이 생성됩니다
+    </div>
+    <div class="legend-row">
+      <span class="leg-item"><span class="leg-line" style="background:#1D4ED8"></span>이번 주 실제</span>
+      <span class="leg-item"><span class="leg-line" style="background:#7C3AED;background-image:none;border:1.5px dashed #7C3AED;height:0;border-width:2px;background:transparent"></span>차주 예측</span>
+      <span class="leg-item"><span style="width:22px;height:10px;background:rgba(124,58,237,.15);border-radius:2px;flex-shrink:0"></span>예측 범위 (±1σ)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="simChart" role="img" aria-label="차주 PV 시뮬레이션 차트"></canvas></div>
+  </section>
+
+
+  <!-- 완독률 · 체류시간 -->
+  <section class="section collapsible" id="sec-quality">
+    <div class="section-hd toggle-hd" onclick="toggleSection('sec-quality')">
+      <span class="section-title">콘텐츠 품질 지표</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="section-note">노란 선 = 완독률(%) / 분홍 선 = 체류시간(분) · 좌측 축 완독률, 우측 축 체류시간</span>
+        <span class="toggle-icon" id="icon-sec-quality">▲</span>
+      </div>
+    </div>
+    <div class="section-body" id="body-sec-quality">
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+        <div class="kpi-card" style="--kpi-color:#F59E0B">
+          <div class="kpi-label">평균 완독률</div>
+          <div class="kpi-value" id="kv-read">—</div>
+          <span class="kpi-badge na" id="kb-read">전주 비교 대기</span>
+          <div class="kpi-vs" id="ks-read"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#EC4899">
+          <div class="kpi-label">평균 체류시간</div>
+          <div class="kpi-value" id="kv-stay">—</div>
+          <span class="kpi-badge na" id="kb-stay">전주 비교 대기</span>
+          <div class="kpi-vs" id="ks-stay"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#10B981">
+          <div class="kpi-label">PV / 방문자</div>
+          <div class="kpi-value" id="kv-pvvis">—</div>
+          <span class="kpi-badge na" id="kb-pvvis">전주 비교 대기</span>
+          <div class="kpi-vs" id="ks-pvvis"></div>
+        </div>
+      </div>
+      <div class="legend-row" style="margin-top:20px">
+        <span class="leg-item"><span class="leg-line" style="background:#F59E0B"></span>완독률 (%)</span>
+        <span class="leg-item"><span class="leg-line" style="background:#EC4899"></span>체류시간 (분)</span>
+        <span class="leg-item" style="font-size:11px;color:#94A3B8;margin-left:4px">좌축 = 완독률 · 우축 = 체류시간</span>
+      </div>
+      <div class="chart-wrap md">
+        <canvas id="qualityChart" role="img" aria-label="완독률 및 체류시간 추이 차트"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- 월간 누적 트렌드 -->
+  <section class="section collapsible" id="sec-monthly">
+    <div class="section-hd toggle-hd" onclick="toggleSection('sec-monthly')">
+      <span class="section-title">월간 누적 트렌드</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="section-note">막대 진할수록 최근 · 하늘색 선 = PV 흐름 · 이번 주 포인트 강조</span>
+        <span class="toggle-icon" id="icon-sec-monthly">▲</span>
+      </div>
+    </div>
+    <div class="section-body" id="body-sec-monthly">
+      <div class="chart-wrap" id="monthlyChartWrap">
+        <canvas id="monthlyChart" role="img" aria-label="월간 누적 PV 트렌드 차트"></canvas>
+      </div>
+      <div style="margin-top:20px;overflow-x:auto">
+        <table class="data-table" id="monthlyTable">
+          <thead>
+            <tr>
+              <th style="text-align:left">주차</th>
+              <th>PV 합계</th>
+              <th>방문자</th>
+              <th>모바일 비중</th>
+              <th>전주 대비</th>
+            </tr>
+          </thead>
+          <tbody id="monthlyTbody">
+            <tr><td colspan="5" class="empty-state">데이터를 불러오세요</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+<footer class="site-footer">
+  AI&amp;데이터팀 박현경 &nbsp;·&nbsp; DA Team &nbsp;·&nbsp; HERB daily_compare &amp; inchannel API &nbsp;·&nbsp; <span id="genTime"></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── CONFIG ─────────────────────────────────────────────
+const API = 'https://hmapapi.hankookilbo.com/cal/daily';
+const PORTALS = ['네이버','다음','구글'];
+const PORTAL_CLR = {'네이버':'#DC2626','다음':'#2563EB','구글':'#16A34A'};
+const WEEKDAY_KO = ['월','화','수','목','금','토','일'];
+const ANOMALY_THR = 0.15;
+
+// ── STATE ──────────────────────────────────────────────
+let S = {
+  weekStart: null,
+  thisWeek: {},   // { "YYYY-MM-DD": dayData }
+  prevWeek: {},
+  history: [],    // [week0, week1, week2, week3] oldest→newest (all before thisWeek)
+  channels: {},   // { "YYYY-MM-DD": { 네이버: N, 다음: N, 구글: N } }
+  prevChannels: {},
+  charts: {},
+  loaded: false,
+};
+
+// ── UTILS ──────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function toYMD(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}${m}${day}`;
+}
+function toISO(d) { return d.toISOString().slice(0,10); }
+
+function weekStart(d) {
+  const r = new Date(d);
+  const day = r.getDay();
+  r.setDate(r.getDate() + (day === 0 ? -6 : 1 - day));
+  r.setHours(0,0,0,0);
+  return r;
+}
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+function weekDates(start) { return Array.from({length:7},(_,i)=>addDays(start,i)); }
+
+function isoWeekNum(d) {
+  const dt = new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const dayNum = dt.getUTCDay()||7;
+  dt.setUTCDate(dt.getUTCDate()+4-dayNum);
+  const ys = new Date(Date.UTC(dt.getUTCFullYear(),0,1));
+  return Math.ceil((((dt-ys)/86400000)+1)/7);
+}
+
+function fmtMan(n) {
+  if (!n) return '0';
+  const m = n/10000;
+  return m >= 100 ? Math.round(m)+'만' : m.toFixed(1)+'만';
+}
+function pctCh(a, b) { return a ? ((b/a-1)*100) : null; }
+function pct(n, d) { return d ? (n/d*100) : 0; }
+
+function sumField(weekObj, field) {
+  return Object.values(weekObj).reduce((s,v)=> s + (v?.[field]||0), 0);
+}
+
+function weeklyChannelSum(chObj, portal) {
+  return Object.values(chObj).reduce((s,v)=> s + (v?.[portal]||0), 0);
+}
+
+// ── API ────────────────────────────────────────────────
+async function fetchDay(dateStr) {
+  try {
+    const url = `${API}?code=daily_compare&company_code=&periodtype=d&startdt=${dateStr}&enddt=${dateStr}`;
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const j = await r.json();
+    let c = j.contents;
+    if (Array.isArray(c)) c = c[0];
+    if (!c || typeof c !== 'object') return null;
+    const int = v => parseInt(v)||0;
+    const flt = v => parseFloat(v)||0;
+    return {
+      pv: int(c.viewcnt), vis: int(c.visitorbcnt), uv: int(c.visitorcnt),
+      pvMob: int(c.viewcntmobile), pvPC: int(c.viewcntpc),
+      visMob: int(c.visitorbcntmobile), visPC: int(c.visitorbcntpc),
+      stayTime: int(c.staytime_avg), readRate: flt(c.readlen_per),
+      pvPerVis: flt(c.visitorbpv),
+    };
+  } catch(e) { return null; }
+}
+
+async function fetchWeek(start) {
+  const dates = weekDates(start);
+  const results = await Promise.all(dates.map(d => fetchDay(toYMD(d))));
+  const obj = {};
+  dates.forEach((d,i) => { if (results[i]) obj[toISO(d)] = results[i]; });
+  return obj;
+}
+
+async function fetchChannelWeek(start) {
+  try {
+    const end = addDays(start, 6);
+    const url = `${API}?code=inchannel&site_presscode=hk&inchanneldetail=all&preweek=1w&periodtype=d&psize=200&startdt=${toYMD(start)}&enddt=${toYMD(end)}`;
+    const r = await fetch(url);
+    if (!r.ok) return {};
+    const j = await r.json();
+    let recs = j.contents || j.data ||
+      (typeof j === 'object' ? Object.values(j).find(v=>Array.isArray(v)) : null) || [];
+    if (!Array.isArray(recs)) recs = [];
+    const result = {};
+    for (const rec of recs) {
+      const ymd = String(rec.ymd||'');
+      if (ymd.length !== 8) continue;
+      const dk = `${ymd.slice(0,4)}-${ymd.slice(4,6)}-${ymd.slice(6,8)}`;
+      const ch = rec.inchannelcode_txt||'';
+      if (!PORTALS.includes(ch)) continue;
+      if (!result[dk]) result[dk] = {};
+      result[dk][ch] = (result[dk][ch]||0) + (parseInt(rec.count)||0);
+    }
+    return result;
+  } catch(e) { return {}; }
+}
+
+// ── PROGRESS ───────────────────────────────────────────
+let progressVal = 0;
+function setProgress(v, msg) {
+  progressVal = v;
+  document.getElementById('progressFill').style.width = v + '%';
+  const el = document.getElementById('statusText');
+  if (msg) {
+    el.innerHTML = `<span class="status-dot"></span>${msg}`;
+  } else if (v >= 100) {
+    el.textContent = '로드 완료 · ' + new Date().toLocaleTimeString('ko-KR');
+    document.querySelector('.status-dot')?.remove();
+  }
+}
+
+// ── LOAD ───────────────────────────────────────────────
+async function loadData() {
+  const btn = document.getElementById('fetchBtn');
+  btn.disabled = true;
+  S.loaded = false;
+  setProgress(0, '데이터 수집 중...');
+
+  try {
+    // 5 weeks: current + 4 history (oldest first)
+    const steps = [
+      { label: '4주 전', start: addDays(S.weekStart, -28) },
+      { label: '3주 전', start: addDays(S.weekStart, -21) },
+      { label: '2주 전', start: addDays(S.weekStart, -14) },
+      { label: '전주',   start: addDays(S.weekStart, -7)  },
+      { label: '이번 주', start: S.weekStart },
+    ];
+
+    const weekResults = [];
+    const chResults = [];
+
+    for (let i = 0; i < steps.length; i++) {
+      const { label, start } = steps[i];
+      setProgress(5 + i*16, `${label} 일별 데이터 수집 중...`);
+      const [wd, ch] = await Promise.all([
+        fetchWeek(start),
+        fetchChannelWeek(start),
+      ]);
+      weekResults.push(wd);
+      chResults.push(ch);
+      await sleep(200);
+      setProgress(5 + (i+1)*16);
+    }
+
+    // Store {start, data} so simulation can reliably map weekday → date
+    S.history = steps.slice(0, 4).map((s, i) => ({ start: s.start, data: weekResults[i] }));
+    S.prevWeek = weekResults[3];
+    S.thisWeek = weekResults[4];
+
+    S.prevChannels = chResults[3];
+    S.channels = chResults[4];
+
+    setProgress(100, '');
+    S.loaded = true;
+    renderAll();
+    document.getElementById('genTime').textContent =
+      '생성: ' + new Date().toLocaleString('ko-KR');
+    const rd = document.getElementById('reportDate');
+    if (rd) rd.textContent = new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'}) + ' 기준';
+
+  } catch(e) {
+    setProgress(0);
+    document.getElementById('statusText').textContent = '⚠ 오류: ' + e.message + ' (CORS 또는 네트워크 문제일 수 있습니다)';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── RENDER ALL ─────────────────────────────────────────
+function renderAll() {
+  renderKPI();
+  renderQuality();
+  renderPVTrend();
+  renderDevice();
+  renderChannels();
+  renderSimulation();
+  renderMonthly();
+}
+
+// ── KPI ────────────────────────────────────────────────
+function renderKPI() {
+  const tw = S.thisWeek, pw = S.prevWeek;
+
+  function kpi(valueId, badgeId, subId, field, label, fmt, showPct) {
+    const v = sumField(tw, field);
+    const p = sumField(pw, field);
+    const ch = pctCh(p, v);
+    document.getElementById(valueId).textContent = fmt(v);
+    const badge = document.getElementById(badgeId);
+    if (ch !== null) {
+      const up = ch >= 0;
+      badge.className = 'kpi-badge ' + (up ? 'up' : 'dn');
+      badge.textContent = (up?'+':'') + ch.toFixed(1) + '%';
+    } else {
+      badge.className = 'kpi-badge na';
+      badge.textContent = '전주 없음';
+    }
+    if (subId) {
+      document.getElementById(subId).textContent =
+        p ? `전주 ${fmt(p)}` : '';
+    }
+  }
+
+  kpi('kv-pv','kb-pv','ks-pv','pv','전체 PV', fmtMan);
+  kpi('kv-vis','kb-vis','ks-vis','vis','방문자', fmtMan);
+  kpi('kv-uv','kb-uv','ks-uv','uv','UV', fmtMan);
+
+  // KPI 코멘트 자동 생성
+  function setComment(id, lines) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = lines;
+  }
+
+  const pvTotC  = sumField(tw,'pv'), pvPrevC = sumField(pw,'pv');
+  const visTotC = sumField(tw,'vis'), visPrevC = sumField(pw,'vis');
+  const uvTotC  = sumField(tw,'uv');
+  const pvChC   = pctCh(pvPrevC, pvTotC);
+  const visChC  = pctCh(visPrevC, visTotC);
+
+  // PV 코멘트 - 최고/최저 요일 찾기
+  const pvByDay = weekDates(S.weekStart).map(d => ({
+    label: WEEKDAY_KO[(d.getDay()+6)%7] + '요일',
+    v: S.thisWeek[toISO(d)]?.pv || 0
+  })).filter(d => d.v > 0);
+  if (pvByDay.length > 0) {
+    const best = pvByDay.reduce((a,b) => a.v > b.v ? a : b);
+    const worst = pvByDay.reduce((a,b) => a.v < b.v ? a : b);
+    const gap = pvByDay.length > 1 ? ((best.v - worst.v) / worst.v * 100) : 0;
+    let pvInsight = '';
+    if (pvChC !== null && Math.abs(pvChC) >= 5) {
+      pvInsight = pvChC >= 5
+        ? `${best.label}에 트래픽이 몰렸어요 — 특정 콘텐츠 바이럴 가능성이 있어요`
+        : `전반적으로 유입이 줄었어요 — 주요 요일 콘텐츠 배치를 점검해보세요`;
+    } else if (gap > 50) {
+      pvInsight = `${best.label} 집중 현상이 뚜렷해요 — 주중 고점과 주말 저점 격차가 커요`;
+    } else {
+      pvInsight = `요일별 편차가 크지 않아요 — 고른 유입 흐름이에요`;
+    }
+    setComment('kc-pv', pvInsight);
+  }
+
+  // 방문자 코멘트
+  if (visTotC > 0) {
+    const pvPerVis = visTotC ? (pvTotC / visTotC) : 0;
+    let visInsight = '';
+    if (pvPerVis < 1.3) {
+      visInsight = `방문당 ${pvPerVis.toFixed(1)}페이지 — 1페이지만 보고 떠나는 비율이 높아요`;
+    } else if (pvPerVis < 1.8) {
+      visInsight = `방문당 ${pvPerVis.toFixed(1)}페이지 — 일부가 추가 콘텐츠를 소비하고 있어요`;
+    } else {
+      visInsight = `방문당 ${pvPerVis.toFixed(1)}페이지 — 깊이 읽는 독자 비중이 높아요`;
+    }
+    setComment('kc-vis', visInsight);
+  }
+
+  // 모바일 비중
+  const mobPV = sumField(tw, 'pvMob');
+  const totPV = sumField(tw, 'pv');
+  const mobRatio = pct(mobPV, totPV);
+  const prevMobPV = sumField(pw, 'pvMob');
+  const prevTotPV = sumField(pw, 'pv');
+  const prevMobRatio = pct(prevMobPV, prevTotPV);
+  document.getElementById('kv-mob').textContent = mobRatio.toFixed(1) + '%';
+  const mobBadge = document.getElementById('kb-mob');
+  if (prevTotPV) {
+    const diff = mobRatio - prevMobRatio;
+    mobBadge.className = 'kpi-badge ' + (diff >= 0 ? 'up' : 'dn');
+    mobBadge.textContent = (diff>=0?'+':'') + diff.toFixed(1) + 'pp';
+  } else {
+    mobBadge.className = 'kpi-badge na';
+    mobBadge.textContent = '전주 없음';
+  }
+  document.getElementById('ks-mob').textContent =
+    prevTotPV ? `전주 ${prevMobRatio.toFixed(1)}%` : '';
+
+  const mobDiff = prevTotPV ? (mobRatio - prevMobRatio) : null;
+  let mobInsight = '';
+  if (mobRatio < 60) {
+    mobInsight = `모바일이 60% 미만으로 내려왔어요 — PC 유입 채널을 확인해보세요`;
+  } else if (mobRatio > 75) {
+    mobInsight = `모바일 비중이 매우 높아요 — 모바일 UX 최적화가 핵심이에요`;
+  } else {
+    mobInsight = `모바일 ${mobRatio.toFixed(0)}%로 안정적인 비중이에요`;
+  }
+  if (mobDiff !== null && Math.abs(mobDiff) >= 2) {
+    mobInsight += mobDiff > 0 ? ` — 모바일 유입이 늘고 있어요` : ` — PC 유입이 늘고 있어요`;
+  }
+  setComment('kc-mob', mobInsight);
+
+  // UV 코멘트
+  const uvRatio = uvTotC && visTotC ? (uvTotC / visTotC * 100) : null;
+  if (uvRatio !== null) {
+    let uvInsight = '';
+    if (uvRatio > 85) {
+      uvInsight = `재방문 비율이 낮아요 — 충성 독자보다 신규 유입 중심이에요`;
+    } else if (uvRatio > 70) {
+      uvInsight = `신규와 재방문이 균형 있게 섞여 있어요`;
+    } else {
+      uvInsight = `재방문 독자 비중이 높아요 — 충성 독자층이 두꺼워요`;
+    }
+    setComment('kc-uv', uvInsight);
+  }
+}
+
+// ── PV TREND ───────────────────────────────────────────
+function renderPVTrend() {
+  const dates = weekDates(S.weekStart);
+  const labels = dates.map(d => {
+    const wdi = (d.getDay()+6)%7;
+    return WEEKDAY_KO[wdi] + ' ' + (d.getMonth()+1)+'/'+ d.getDate();
+  });
+
+  const thisData = dates.map(d => S.thisWeek[toISO(d)]?.pv || null);
+  const prevDates = weekDates(addDays(S.weekStart,-7));
+  const prevData  = prevDates.map(d => S.prevWeek[toISO(d)]?.pv || null);
+
+  // Anomaly detection: 4-week weekday average
+  const anomalies = [];
+  dates.forEach((d, wdi) => {
+    const vals = S.history
+      .map(w => w[toISO(addDays(addDays(S.weekStart,-28+wdi*1), (wdi - wdi)))])
+      .filter(Boolean)
+      .map(v => v.pv);
+    // Recalculate correctly: same weekday across 4 history weeks
+    const histVals = S.history.map(({ start, data }) => {
+      return data[toISO(addDays(start, wdi))]?.pv;
+    }).filter(v => v != null && v > 0);
+
+    if (histVals.length >= 2) {
+      const avg = histVals.reduce((a,b)=>a+b,0)/histVals.length;
+      const actual = thisData[wdi];
+      if (actual && avg > 0) {
+        const dev = (actual - avg) / avg;
+        if (Math.abs(dev) >= ANOMALY_THR) {
+          anomalies.push({ day: labels[wdi], dev, avg, actual });
+        }
+      }
+    }
+  });
+
+  // Render anomaly chips
+  const anomRow = document.getElementById('anomalyRow');
+  if (anomalies.length === 0) {
+    anomRow.innerHTML = '<span class="anomaly-chip ok">✓ 이번 주 이상 패턴 없음 (4주 평균 기준)</span>';
+  } else {
+    anomRow.innerHTML = anomalies.map(a => {
+      const cls = a.dev > 0 ? 'spike' : 'drop';
+      const icon = a.dev > 0 ? '↑' : '↓';
+      const sign = a.dev > 0 ? '+' : '';
+      return `<span class="anomaly-chip ${cls}">${icon} ${a.day} ${sign}${(a.dev*100).toFixed(0)}% (평균 ${fmtMan(Math.round(a.avg))} → 실제 ${fmtMan(a.actual)})</span>`;
+    }).join('');
+  }
+
+  // Chart
+  if (S.charts.pvTrend) S.charts.pvTrend.destroy();
+  S.charts.pvTrend = new Chart(document.getElementById('pvTrendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '이번 주 PV',
+          data: thisData,
+          borderColor: '#1D4ED8',
+          backgroundColor: 'rgba(29,78,216,.06)',
+          borderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#1D4ED8',
+          tension: 0.3,
+          fill: true,
+          spanGaps: true,
+        },
+        {
+          label: '전주 PV',
+          data: prevData,
+          borderColor: '#94A3B8',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [6,4],
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#94A3B8',
+          tension: 0.3,
+          fill: false,
+          spanGaps: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 60, bottom: 4 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + fmtMan(ctx.raw),
+          },
+        },
+        datalabels: {
+          display: ctx => ctx.dataIndex === ctx.dataset.data.filter(v=>v!=null).length - 1,
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '700' }, color: '#374151' } },
+        y: {
+          ticks: { callback: v => fmtMan(v), font: { size: 11 }, color: '#64748B', maxTicksLimit: 5 },
+          grid: { color: 'rgba(0,0,0,.04)' },
+        },
+      },
+    },
+  });
+}
+
+// ── DEVICE ─────────────────────────────────────────────
+function renderDevice() {
+  const tw = S.thisWeek;
+  const pvTot = sumField(tw,'pv'), pvMob = sumField(tw,'pvMob'), pvPC = sumField(tw,'pvPC');
+  const visTot = sumField(tw,'vis'), visMob = sumField(tw,'visMob'), visPC = sumField(tw,'visPC');
+
+  const pvMobPct = pct(pvMob, pvTot);
+  const pvPcPct  = pct(pvPC, pvTot);
+  const visMobPct = pct(visMob, visTot);
+  const visPcPct  = pct(visPC, visTot);
+
+  document.getElementById('devPvMobPct').textContent = pvMobPct.toFixed(1) + '%';
+  document.getElementById('devPvMobBar').style.width = pvMobPct + '%';
+  document.getElementById('devPvPcBar').style.width = pvPcPct + '%';
+  document.getElementById('devPvMobVal').textContent = fmtMan(pvMob);
+  document.getElementById('devPvPcVal').textContent = fmtMan(pvPC);
+
+  document.getElementById('devVisMobPct').textContent = visMobPct.toFixed(1) + '%';
+  document.getElementById('devVisMobBar').style.width = visMobPct + '%';
+  document.getElementById('devVisPcBar').style.width = visPcPct + '%';
+  document.getElementById('devVisMobVal').textContent = fmtMan(visMob);
+  document.getElementById('devVisPcVal').textContent = fmtMan(visPC);
+
+  // Daily device chart
+  const dates = weekDates(S.weekStart);
+  const labels = dates.map(d => {
+    const wdi = (d.getDay()+6)%7;
+    return WEEKDAY_KO[wdi];
+  });
+  const mobData = dates.map(d => S.thisWeek[toISO(d)]?.pvMob || 0);
+  const pcData  = dates.map(d => S.thisWeek[toISO(d)]?.pvPC  || 0);
+
+  if (S.charts.device) S.charts.device.destroy();
+  S.charts.device = new Chart(document.getElementById('deviceChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '모바일 PV', data: mobData, backgroundColor: 'rgba(29,78,216,.8)', borderRadius: 4 },
+        { label: 'PC PV',     data: pcData,  backgroundColor: 'rgba(148,163,184,.5)', borderRadius: 4 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtMan(ctx.raw) } },
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: '700' }, color: '#374151' } },
+        y: { stacked: true, ticks: { callback: v => fmtMan(v), font: { size: 10 }, color: '#64748B', maxTicksLimit: 4 }, grid: { color: 'rgba(0,0,0,.04)' } },
+      },
+    },
+  });
+}
+
+// ── CHANNELS ───────────────────────────────────────────
+function renderChannels() {
+  const tbody = document.getElementById('channelTbody');
+  const rows = PORTALS.map(p => {
+    const tw  = weeklyChannelSum(S.channels, p);
+    const pw  = weeklyChannelSum(S.prevChannels, p);
+    const ch  = pctCh(pw, tw);
+    const clr = PORTAL_CLR[p];
+    const badgeCls = ch === null ? 'na' : ch >= 0 ? 'up' : 'dn';
+    const badgeTxt = ch === null ? '-' : (ch>=0?'+':'') + ch.toFixed(1) + '%';
+    return `<tr>
+      <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${clr};margin-right:7px;"></span>${p}</td>
+      <td>${fmtMan(tw)}</td>
+      <td style="color:#64748B">${fmtMan(pw)}</td>
+      <td><span class="kpi-badge ${badgeCls}" style="font-size:11px;padding:2px 8px">${badgeTxt}</span></td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join('');
+
+  // Channel line chart (daily, this week)
+  const dates = weekDates(S.weekStart);
+  const labels = dates.map(d => {
+    const wdi = (d.getDay()+6)%7;
+    return WEEKDAY_KO[wdi];
+  });
+
+  const datasets = PORTALS.map(p => ({
+    label: p,
+    data: dates.map(d => S.channels[toISO(d)]?.[p] || 0),
+    borderColor: PORTAL_CLR[p],
+    backgroundColor: 'transparent',
+    pointBackgroundColor: PORTAL_CLR[p],
+    borderWidth: 2.5,
+    pointRadius: 5,
+    pointHoverRadius: 7,
+    tension: 0.3,
+    fill: false,
+  }));
+
+  // 채널 인사이트
+  const channelInsightEl = document.getElementById('channelInsight');
+  if (channelInsightEl) {
+    const changes = PORTALS.map(p => ({
+      name: p,
+      tw: weeklyChannelSum(S.channels, p),
+      pw: weeklyChannelSum(S.prevChannels, p),
+    })).map(c => ({ ...c, ch: pctCh(c.pw, c.tw) })).filter(c => c.ch !== null);
+    if (changes.length > 0) {
+      const best = changes.reduce((a,b) => (a.ch||0) > (b.ch||0) ? a : b);
+      const worst = changes.reduce((a,b) => (a.ch||0) < (b.ch||0) ? a : b);
+      let msg = '';
+      if (best.ch > 10) msg = `${best.name} 유입이 전주보다 ${best.ch.toFixed(0)}% 늘었어요`;
+      else if (worst.ch < -10) msg = `${worst.name} 유입이 전주보다 ${Math.abs(worst.ch).toFixed(0)}% 줄었어요 — 원인 확인이 필요해요`;
+      else msg = `포털 3사 유입이 전주와 비슷한 수준을 유지하고 있어요`;
+      channelInsightEl.textContent = msg;
+      channelInsightEl.style.display = 'block';
+    }
+  }
+
+  if (S.charts.channel) S.charts.channel.destroy();
+  S.charts.channel = new Chart(document.getElementById('channelChart'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtMan(ctx.raw) } },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11, weight: '700' }, color: '#374151' } },
+        y: { ticks: { callback: v => fmtMan(v), font: { size: 10 }, color: '#64748B', maxTicksLimit: 4 }, grid: { color: 'rgba(0,0,0,.04)' } },
+      },
+    },
+  });
+}
+
+// ── SIMULATION ─────────────────────────────────────────
+function renderSimulation() {
+  // For each weekday, calculate average and stddev from 4 history weeks
+  const avgByWD = [], stdByWD = [];
+
+  for (let wdi = 0; wdi < 7; wdi++) {
+    const vals = S.history.map(({ start, data }) => {
+      const d = toISO(addDays(start, wdi));
+      return data[d]?.pv || null;
+    }).filter(v => v != null && v > 0);
+
+    const avg = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    const std = vals.length > 1
+      ? Math.sqrt(vals.map(v=>(v-avg)**2).reduce((a,b)=>a+b,0)/(vals.length-1))
+      : avg * 0.08;
+
+    avgByWD.push(Math.round(avg));
+    stdByWD.push(Math.round(std));
+  }
+
+  // Next week dates
+  const nextWeekStart = addDays(S.weekStart, 7);
+  const nextDates = weekDates(nextWeekStart);
+  const nextLabels = nextDates.map(d => {
+    const wdi = (d.getDay()+6)%7;
+    return WEEKDAY_KO[wdi] + ' ' + (d.getMonth()+1)+'/'+ d.getDate();
+  });
+
+  // This week actual (for reference)
+  const thisActual = weekDates(S.weekStart).map(d => S.thisWeek[toISO(d)]?.pv || null);
+
+  const upper = avgByWD.map((a,i) => a + stdByWD[i]);
+  const lower = avgByWD.map((a,i) => Math.max(0, a - stdByWD[i]));
+
+  // Info text
+  const totPredicted = avgByWD.reduce((a,b)=>a+b,0);
+  const totActual = thisActual.reduce((a,b)=>a+(b||0),0);
+  const simCh = pctCh(totActual, totPredicted);
+  let simMsg = '';
+  if (simCh !== null) {
+    if (simCh >= 10) simMsg = `이번 주보다 ${simCh.toFixed(0)}% 높을 것으로 예상돼요 — 상승 흐름이 이어질 가능성이 있어요`;
+    else if (simCh >= 0) simMsg = `이번 주와 비슷한 수준이 예상돼요 (${simCh.toFixed(1)}% ↑) — 안정적인 흐름이에요`;
+    else if (simCh >= -10) simMsg = `이번 주보다 소폭 낮을 수 있어요 (${Math.abs(simCh).toFixed(1)}% ↓) — 주 초반 콘텐츠 배치를 신경써주세요`;
+    else simMsg = `이번 주보다 ${Math.abs(simCh).toFixed(0)}% 낮을 것으로 예상돼요 — 차주 주요 이슈 발굴이 필요해요`;
+  } else {
+    simMsg = '4주 데이터 기반 예측이에요 — 범위 안에 들어오면 정상 흐름이에요';
+  }
+  document.getElementById('simInfoBox').innerHTML =
+    `차주 예측 합계 <strong>${fmtMan(totPredicted)}</strong> &nbsp;·&nbsp; ${simMsg}`;
+
+  if (S.charts.sim) S.charts.sim.destroy();
+  S.charts.sim = new Chart(document.getElementById('simChart'), {
+    type: 'line',
+    data: {
+      labels: nextLabels,
+      datasets: [
+        {
+          label: '이번 주 실제 PV (참고)',
+          data: thisActual,
+          borderColor: '#93C5FD',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 3,
+          pointBackgroundColor: '#93C5FD',
+          tension: 0.3,
+          fill: false,
+          spanGaps: true,
+        },
+        {
+          label: '예측 상한',
+          data: upper,
+          borderColor: 'rgba(124,58,237,.15)',
+          backgroundColor: 'rgba(124,58,237,.08)',
+          borderWidth: 0,
+          pointRadius: 0,
+          fill: '+1',
+          tension: 0.3,
+        },
+        {
+          label: '차주 예측',
+          data: avgByWD,
+          borderColor: '#7C3AED',
+          borderWidth: 2.5,
+          borderDash: [8, 4],
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#7C3AED',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          fill: false,
+        },
+        {
+          label: '예측 하한',
+          data: lower,
+          borderColor: 'rgba(124,58,237,.15)',
+          backgroundColor: 'rgba(124,58,237,.08)',
+          borderWidth: 0,
+          pointRadius: 0,
+          fill: false,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 60, bottom: 4 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label.includes('상한') || ctx.dataset.label.includes('하한')) return null;
+              return ctx.dataset.label + ': ' + fmtMan(ctx.raw);
+            }
+          }
+        },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '700' }, color: '#374151' } },
+        y: {
+          ticks: { callback: v => fmtMan(v), font: { size: 11 }, color: '#64748B', maxTicksLimit: 5 },
+          grid: { color: 'rgba(0,0,0,.04)' },
+        },
+      },
+    },
+  });
+}
+
+
+
+// ── QUALITY METRICS ───────────────────────────────────
+function avgField(weekObj, field) {
+  const vals = Object.values(weekObj).map(v => v?.[field]).filter(v => v && v > 0);
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+}
+
+function renderQuality() {
+  const tw = S.thisWeek, pw = S.prevWeek;
+
+  function qkpi(valId, badgeId, subId, field, fmt, higher) {
+    const v = avgField(tw, field);
+    const p = avgField(pw, field);
+    const ch = pctCh(p, v);
+    document.getElementById(valId).textContent = fmt(v);
+    const badge = document.getElementById(badgeId);
+    if (ch !== null && p > 0) {
+      const good = higher ? ch >= 0 : ch <= 0;
+      badge.className = 'kpi-badge ' + (good ? 'up' : 'dn');
+      badge.textContent = (ch>=0?'+':'') + ch.toFixed(1) + '%';
+    } else {
+      badge.className = 'kpi-badge na';
+      badge.textContent = '전주 없음';
+    }
+    if (subId && p > 0) document.getElementById(subId).textContent = `전주 ${fmt(p)}`;
+  }
+
+  qkpi('kv-read','kb-read','ks-read','readRate', v => v.toFixed(1)+'%', true);
+  qkpi('kv-stay','kb-stay','ks-stay','stayTime', v => {
+    const m = Math.floor(v/60), s = Math.round(v%60);
+    return m > 0 ? `${m}분 ${s}초` : `${s}초`;
+  }, true);
+  qkpi('kv-pvvis','kb-pvvis','ks-pvvis','pvPerVis', v => v.toFixed(2), true);
+
+  // Daily quality chart
+  const dates = weekDates(S.weekStart);
+  const labels = dates.map(d => WEEKDAY_KO[(d.getDay()+6)%7]);
+  const readData = dates.map(d => {
+    const v = S.thisWeek[toISO(d)]?.readRate;
+    return v && v > 0 ? parseFloat(v.toFixed(1)) : null;
+  });
+  const stayData = dates.map(d => {
+    const v = S.thisWeek[toISO(d)]?.stayTime;
+    return v && v > 0 ? Math.round(v/60*10)/10 : null;
+  });
+
+  if (S.charts.quality) S.charts.quality.destroy();
+  S.charts.quality = new Chart(document.getElementById('qualityChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '완독률 (%)',
+          data: readData,
+          borderColor: '#F59E0B',
+          backgroundColor: 'rgba(245,158,11,.08)',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointBackgroundColor: '#F59E0B',
+          tension: 0.3,
+          fill: true,
+          yAxisID: 'y',
+          spanGaps: true,
+        },
+        {
+          label: '체류시간 (분)',
+          data: stayData,
+          borderColor: '#EC4899',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointBackgroundColor: '#EC4899',
+          tension: 0.3,
+          fill: false,
+          yAxisID: 'y2',
+          spanGaps: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw } },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 12, weight: '700' }, color: '#374151' } },
+        y: {
+          position: 'left',
+          ticks: { callback: v => v + '%', font: { size: 11 }, color: '#F59E0B', maxTicksLimit: 5 },
+          grid: { color: 'rgba(0,0,0,.04)' },
+        },
+        y2: {
+          position: 'right',
+          ticks: { callback: v => v + '분', font: { size: 11 }, color: '#EC4899', maxTicksLimit: 5 },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+// ── MONTHLY TREND ──────────────────────────────────────
+function renderMonthly() {
+  // Build 12-week series: 11 history weeks + this week
+  // We have 4 weeks in S.history; extend back if needed using what we have
+  const allWeeks = [...S.history, { start: S.weekStart, data: S.thisWeek }];
+
+  // Build labels and data from available weeks
+  const labels = allWeeks.map(({ start }) => {
+    const wn = isoWeekNum(start);
+    return `${start.getMonth()+1}/${start.getDate()} (${wn}주)`;
+  });
+
+  const pvData    = allWeeks.map(({ data }) => sumField(data, 'pv'));
+  const visData   = allWeeks.map(({ data }) => sumField(data, 'vis'));
+  const mobRatios = allWeeks.map(({ data }) => {
+    const mob = sumField(data, 'pvMob'), tot = sumField(data, 'pv');
+    return tot ? parseFloat((mob/tot*100).toFixed(1)) : 0;
+  });
+
+  // Table
+  const tbody = document.getElementById('monthlyTbody');
+  const rows = allWeeks.map(({ start, data }, i) => {
+    const wn = isoWeekNum(start);
+    const we = addDays(start, 6);
+    const pvW = sumField(data, 'pv');
+    const visW = sumField(data, 'vis');
+    const mob = sumField(data, 'pvMob');
+    const mobR = pvW ? (mob/pvW*100).toFixed(1) : '—';
+    const prev = i > 0 ? sumField(allWeeks[i-1].data, 'pv') : null;
+    const ch = prev ? pctCh(prev, pvW) : null;
+    const isThis = i === allWeeks.length - 1;
+    const badgeCls = ch === null ? 'na' : ch >= 0 ? 'up' : 'dn';
+    const badgeTxt = ch === null ? '—' : (ch>=0?'+':'') + ch.toFixed(1) + '%';
+    return `<tr ${isThis ? 'style="background:#EFF6FF;font-weight:800"' : ''}>
+      <td>${wn}주차 (${start.getMonth()+1}/${start.getDate()}~${we.getMonth()+1}/${we.getDate()})${isThis ? ' <span style="font-size:10px;color:#1D4ED8;background:#DBEAFE;padding:2px 6px;border-radius:4px;margin-left:4px">이번 주</span>' : ''}</td>
+      <td>${fmtMan(pvW)}</td>
+      <td>${fmtMan(visW)}</td>
+      <td>${mobR}%</td>
+      <td><span class="kpi-badge ${badgeCls}" style="font-size:11px;padding:2px 8px">${badgeTxt}</span></td>
+    </tr>`;
+  }).reverse().join('');
+  tbody.innerHTML = rows;
+
+  // Chart
+  // 막대: 이번 주 강조, 나머지는 단계적으로 연하게
+  const barColors = pvData.map((_, i) => {
+    if (i === pvData.length - 1) return 'rgba(29,78,216,.85)';
+    if (i === pvData.length - 2) return 'rgba(29,78,216,.5)';
+    return 'rgba(29,78,216,.2)';
+  });
+
+  if (S.charts.monthly) S.charts.monthly.destroy();
+  S.charts.monthly = new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '주간 PV',
+          data: pvData,
+          backgroundColor: barColors,
+          borderRadius: 6,
+          borderSkipped: false,
+          order: 2,
+        },
+        {
+          label: 'PV 추이',
+          data: pvData,
+          type: 'line',
+          borderColor: '#0EA5E9',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: pvData.map((_, i) => i === pvData.length-1 ? '#1D4ED8' : '#0EA5E9'),
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          tension: 0.35,
+          fill: false,
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label === 'PV 추이') return null;
+              const i = ctx.dataIndex;
+              const tag = i === pvData.length-1 ? ' ← 이번 주' : '';
+              return `PV: ${fmtMan(ctx.raw)}${tag}`;
+            },
+            filter: item => item.dataset.label !== 'PV 추이',
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '700' }, color: '#374151', maxRotation: 30, autoSkip: false },
+        },
+        y: {
+          ticks: { callback: v => fmtMan(v), font: { size: 11 }, color: '#64748B', maxTicksLimit: 5 },
+          grid: { color: 'rgba(0,0,0,.04)' },
+        },
+      },
+    },
+  });
+}
+
+// ── COLLAPSIBLE ────────────────────────────────────────
+function toggleSection(id) {
+  const body = document.getElementById('body-' + id);
+  const icon = document.getElementById('icon-' + id);
+  body.classList.toggle('collapsed');
+  icon.classList.toggle('collapsed');
+}
+
+// ── WEEK NAV ───────────────────────────────────────────
+function updateWeekLabel() {
+  const ws = S.weekStart;
+  const we = addDays(ws, 6);
+  const wn = isoWeekNum(ws);
+  document.getElementById('weekLabel').textContent =
+    `${ws.getFullYear()}년 ${wn}주차`;
+  document.getElementById('weekDatesStr').textContent =
+    `${ws.getMonth()+1}/${ws.getDate()} — ${we.getMonth()+1}/${we.getDate()}`;
+  document.getElementById('reportSubtitle').textContent =
+    ` · ${ws.getFullYear()}.${String(ws.getMonth()+1).padStart(2,'0')}.${String(ws.getDate()).padStart(2,'0')} ~ ${we.getFullYear()}.${String(we.getMonth()+1).padStart(2,'0')}.${String(we.getDate()).padStart(2,'0')}`;
+}
+
+// ── INIT ───────────────────────────────────────────────
+function init() {
+  // Default: last complete week
+  const today = new Date();
+  const thisMonday = weekStart(today);
+  S.weekStart = addDays(thisMonday, -7); // last week
+  updateWeekLabel();
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    S.weekStart = addDays(S.weekStart, -7);
+    updateWeekLabel();
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    const next = addDays(S.weekStart, 7);
+    if (next <= new Date()) { S.weekStart = next; updateWeekLabel(); }
+  });
+  document.getElementById('fetchBtn').addEventListener('click', loadData);
+
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+// ── PASSWORD GATE ──────────────────────────────────────
+(function() {
+  const PASS = 'hankookilbo1';
+  const KEY = 'da_auth_v2';
+  const gate = document.getElementById('pwGate');
+  const input = document.getElementById('pwInput');
+  const submitBtn = document.getElementById('pwSubmit');
+  const errEl = document.getElementById('pwErr');
+  const eyeBtn = document.getElementById('pwToggle');
+
+  // 이미 인증된 세션이면 바로 열기
+  if (sessionStorage.getItem(KEY) === '1') { gate.remove(); return; }
+
+  // 눈 아이콘 — 누르는 동안 보이기
+  if (eyeBtn) {
+    eyeBtn.addEventListener('mousedown', function(e) { e.preventDefault(); input.type = 'text'; });
+    eyeBtn.addEventListener('mouseup',   function()  { input.type = 'password'; input.focus(); });
+    eyeBtn.addEventListener('mouseleave',function()  { input.type = 'password'; });
+  }
+
+  function tryUnlock() {
+    if (input.value === PASS) {
+      sessionStorage.setItem(KEY, '1');
+      gate.style.transition = 'opacity .3s';
+      gate.style.opacity = '0';
+      setTimeout(function() { gate.remove(); }, 300);
+    } else {
+      errEl.textContent = '비밀번호가 맞지 않습니다';
+      input.value = '';
+      input.style.borderColor = '#EF4444';
+      setTimeout(function() {
+        errEl.textContent = '';
+        input.style.borderColor = 'rgba(255,255,255,.12)';
+      }, 1800);
+    }
+  }
+
+  submitBtn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryUnlock(); });
+  input.focus();
+})();
+
+</script>
+</body>
+</html>
