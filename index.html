@@ -417,7 +417,7 @@ body{
     <section class="section">
       <div class="section-hd">
         <span class="section-title">유입채널 · 포털 3사</span>
-        <span class="section-note">포털 3사 유입 방문자(BC) · 표 = 전주 비교 / 차트 = 일별 유입 흐름</span>
+        <span class="section-note">포털 3사 유입 PV · 표 = 전주 비교 / 차트 = 일별 유입 흐름</span>
       </div>
       <div class="insight-box" id="channelInsight" style="display:none"></div>
       <table class="data-table" id="channelTable">
@@ -434,7 +434,7 @@ body{
         </tbody>
       </table>
       <div class="chart-wrap sm" style="margin-top:20px">
-        <canvas id="channelChart" role="img" aria-label="채널별 방문자 추이 차트"></canvas>
+        <canvas id="channelChart" role="img" aria-label="채널별 PV 추이 차트"></canvas>
       </div>
     </section>
   </div>
@@ -1068,7 +1068,7 @@ function renderChannels() {
     fill: false,
   }));
 
-  // 채널 인사이트
+  // 채널 인사이트 (count = PV 기준)
   const channelInsightEl = document.getElementById('channelInsight');
   if (channelInsightEl) {
     const changes = PORTALS.map(p => ({
@@ -1096,7 +1096,7 @@ function renderChannels() {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtMan(ctx.raw) } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtMan(ctx.raw) + ' (PV)' } },
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 11, weight: '700' }, color: '#374151' } },
