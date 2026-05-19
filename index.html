@@ -213,6 +213,18 @@ body{
   margin-bottom:16px;line-height:1.6;
 }
 
+/* ── CHANNEL DEF BOX ── */
+.ch-def-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.ch-def-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#64748B;margin-bottom:10px}
+.ch-def-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}
+.ch-def-row:last-child{margin-bottom:0}
+.ch-def-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ch-def-name{font-size:12.5px;font-weight:800;color:#0F172A;margin-bottom:2px}
+.ch-def-desc{font-size:12px;color:#374151;line-height:1.7}
+.ch-def-cond{font-size:11px;color:#64748B;margin-top:3px;font-style:italic}
+.ch-def-divider{height:1px;background:#E2E8F0;margin:10px 0}
+.ch-def-note{font-size:12px;color:#475569;line-height:1.7}
+
 /* ── COLLAPSIBLE ── */
 .toggle-hd{cursor:pointer;user-select:none}
 .toggle-hd:hover .section-title{color:#1D4ED8}
@@ -413,13 +425,34 @@ body{
       <div class="chart-wrap sm" style="margin-top:16px"><canvas id="deviceChart" role="img" aria-label="디바이스별 PV 비중 차트"></canvas></div>
     </section>
 
-    <!-- 유입채널 포털 3사 -->
+    <!-- 유입채널 Top 5 -->
     <section class="section">
       <div class="section-hd">
-        <span class="section-title">유입채널 · 포털 3사</span>
-        <span class="section-note">포털 3사 유입 PV · 표 = 전주 비교 / 차트 = 일별 유입 흐름</span>
+        <span class="section-title">유입채널 Top 5</span>
+        <span class="section-note">유입 PV 기준 상위 5개 채널 · 직접유입 = 리퍼러 없음(주소창·북마크·앱 내 브라우저 등) · 한국일보 = 자사 도메인 경유</span>
       </div>
       <div class="insight-box" id="channelInsight" style="display:none"></div>
+      <div class="ch-def-box">
+        <div class="ch-def-title">📌 채널 정의 — 직접유입 · 한국일보</div>
+        <div class="ch-def-row">
+          <div class="ch-def-dot" style="background:#1D4ED8"></div>
+          <div>
+            <div class="ch-def-name">직접유입</div>
+            <div class="ch-def-desc">이전 방문 페이지 정보가 없는 트래픽. 주소창 직접 입력·북마크 접근이 대표적이며, <strong>카카오톡·앱 내 브라우저</strong>에서 열린 경우도 포함될 수 있습니다.</div>
+            <div class="ch-def-cond">기술 조건: 리퍼러(이전 페이지) 없음 · did(유입 경로 식별 코드) 없음</div>
+          </div>
+        </div>
+        <div class="ch-def-row">
+          <div class="ch-def-dot" style="background:#D97706"></div>
+          <div>
+            <div class="ch-def-name">한국일보</div>
+            <div class="ch-def-desc">이전 방문 페이지가 hankookilbo.com인 트래픽. 사이트 내 링크 클릭·앱·<strong>뉴스레터</strong> 등 한국일보 도메인에서 넘어온 모든 경우가 해당됩니다.</div>
+            <div class="ch-def-cond">기술 조건: 리퍼러에 hankookilbo.com 포함</div>
+          </div>
+        </div>
+        <div class="ch-def-divider"></div>
+        <div class="ch-def-note">※ <strong>직접유입</strong>은 출처를 특정할 수 없는 트래픽의 집합이고, <strong>한국일보</strong>는 출처가 명확하게 자사 도메인으로 확인된 트래픽입니다.</div>
+      </div>
       <table class="data-table" id="channelTable">
         <thead>
           <tr>
@@ -439,22 +472,7 @@ body{
     </section>
   </div>
 
-  <!-- 차주 시뮬레이션 -->
-  <section class="section">
-    <div class="section-hd">
-      <span class="section-title">차주 PV 시뮬레이션</span>
-      <span class="section-note">보라 점선 = 차주 예측값 / 연보라 범위 = ±1σ (과거 4주 요일 편차) · 파란 참고선 = 이번 주 실제</span>
-    </div>
-    <div class="sim-info-box" id="simInfoBox">
-      데이터 로드 후 시뮬레이션이 생성됩니다
-    </div>
-    <div class="legend-row">
-      <span class="leg-item"><span class="leg-line" style="background:#1D4ED8"></span>이번 주 실제</span>
-      <span class="leg-item"><span class="leg-line" style="background:#7C3AED;background-image:none;border:1.5px dashed #7C3AED;height:0;border-width:2px;background:transparent"></span>차주 예측</span>
-      <span class="leg-item"><span style="width:22px;height:10px;background:rgba(124,58,237,.15);border-radius:2px;flex-shrink:0"></span>예측 범위 (±1σ)</span>
-    </div>
-    <div class="chart-wrap"><canvas id="simChart" role="img" aria-label="차주 PV 시뮬레이션 차트"></canvas></div>
-  </section>
+
 
 
   <!-- 완독률 · 체류시간 -->
@@ -540,8 +558,8 @@ body{
 <script>
 // ── CONFIG ─────────────────────────────────────────────
 const API = 'https://hmapapi.hankookilbo.com/cal/daily';
-const PORTALS = ['네이버','다음','구글'];
-const PORTAL_CLR = {'네이버':'#DC2626','다음':'#2563EB','구글':'#16A34A'};
+const PORTALS = ['직접유입','한국일보','네이버','다음','구글'];
+const PORTAL_CLR = {'직접유입':'#1D4ED8','한국일보':'#D97706','네이버':'#DC2626','다음':'#2563EB','구글':'#16A34A'};
 const WEEKDAY_KO = ['월','화','수','목','금','토','일'];
 const ANOMALY_THR = 0.15;
 
@@ -734,7 +752,7 @@ function renderAll() {
   renderPVTrend();
   renderDevice();
   renderChannels();
-  renderSimulation();
+  // renderSimulation(); // 차주 시뮬레이션 섹션 제거됨
   renderMonthly();
 }
 
@@ -1081,8 +1099,8 @@ function renderChannels() {
       const worst = changes.reduce((a,b) => (a.ch||0) < (b.ch||0) ? a : b);
       let msg = '';
       if (best.ch > 10) msg = `${best.name} 유입이 전주보다 ${best.ch.toFixed(0)}% 늘었어요`;
-      else if (worst.ch < -10) msg = `${worst.name} 유입이 전주보다 ${Math.abs(worst.ch).toFixed(0)}% 줄었어요 — 원인 확인이 필요해요`;
-      else msg = `포털 3사 유입이 전주와 비슷한 수준을 유지하고 있어요`;
+      else if (worst.ch < -10) msg = `${worst.name} 유입이 전주보다 ${Math.abs(worst.ch).toFixed(0)}% 줄었어요`;
+      else msg = `유입채널 전체가 전주와 비슷한 수준을 유지하고 있어요`;
       channelInsightEl.textContent = msg;
       channelInsightEl.style.display = 'block';
     }
@@ -1108,8 +1126,8 @@ function renderChannels() {
 
 // ── SIMULATION ─────────────────────────────────────────
 function renderSimulation() {
-  // For each weekday, calculate average and stddev from 4 history weeks
-  const avgByWD = [], stdByWD = [];
+  // 차주 시뮬레이션 섹션 제거 — 함수 호출 시 아무것도 하지 않음
+  return;
 
   for (let wdi = 0; wdi < 7; wdi++) {
     const vals = S.history.map(({ start, data }) => {
