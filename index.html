@@ -390,14 +390,13 @@ body{
   </section>
 
   <!-- 디바이스 + 채널 -->
-  <div class="two-col">
-
-    <!-- 디바이스 분포 -->
-    <section class="section">
-      <div class="section-hd">
-        <span class="section-title">디바이스 분포</span>
-        <span class="section-note">파란 바 = 모바일 / 회색 바 = PC · 가로 막대는 비중, 차트는 일별 추이</span>
-      </div>
+  <!-- 디바이스 분포 -->
+  <section class="section">
+    <div class="section-hd">
+      <span class="section-title">디바이스 분포</span>
+      <span class="section-note">파란 바 = 모바일 / 회색 바 = PC · 가로 막대는 비중, 차트는 일별 추이</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center">
       <div id="devBars">
         <div class="dev-bar-wrap">
           <div class="dev-bar-label"><span>PV 모바일</span><span id="devPvMobPct">—</span></div>
@@ -422,55 +421,74 @@ body{
           </div>
         </div>
       </div>
-      <div class="chart-wrap sm" style="margin-top:16px"><canvas id="deviceChart" role="img" aria-label="디바이스별 PV 비중 차트"></canvas></div>
-    </section>
+      <div class="chart-wrap sm" style="margin:0"><canvas id="deviceChart" role="img" aria-label="디바이스별 PV 비중 차트"></canvas></div>
+    </div>
+  </section>
 
-    <!-- 유입채널 Top 5 -->
-    <section class="section">
-      <div class="section-hd">
-        <span class="section-title">유입채널 Top 5</span>
-        <span class="section-note">유입 PV 기준 상위 5개 채널 · 직접유입 = 리퍼러 없음(주소창·북마크·앱 내 브라우저 등) · 한국일보 = 자사 도메인 경유</span>
+
+  <!-- 유입채널 통합 카드 -->
+  <section class="section" style="margin-top:20px">
+    <div class="section-hd">
+      <span class="section-title">유입채널 Top 5</span>
+      <span class="section-note">유입 PV 기준 · 직접유입 = 리퍼러 없음 · 한국일보 = 자사 도메인 경유</span>
+    </div>
+    <div class="insight-box" id="channelInsight" style="display:none"></div>
+
+    <!-- 상단: 주간 합계 테이블 + 라인 차트 -->
+    <div style="display:grid;grid-template-columns:5fr 7fr;gap:28px;margin-bottom:20px;align-items:start">
+      <div>
+        <table class="data-table" id="channelTable">
+          <thead>
+            <tr>
+              <th>채널</th>
+              <th>이번 주</th>
+              <th>전주</th>
+              <th>변화</th>
+            </tr>
+          </thead>
+          <tbody id="channelTbody">
+            <tr><td colspan="4" class="empty-state">데이터를 불러오세요</td></tr>
+          </tbody>
+        </table>
+
       </div>
-      <div class="insight-box" id="channelInsight" style="display:none"></div>
-      <div class="ch-def-box">
-        <div class="ch-def-title">📌 채널 정의 — 직접유입 · 한국일보</div>
-        <div class="ch-def-row">
-          <div class="ch-def-dot" style="background:#1D4ED8"></div>
-          <div>
-            <div class="ch-def-name">직접유입</div>
-            <div class="ch-def-desc">이전 방문 페이지 정보가 없는 트래픽. 주소창 직접 입력·북마크 접근이 대표적이며, <strong>카카오톡·앱 내 브라우저</strong>에서 열린 경우도 포함될 수 있습니다.</div>
-            <div class="ch-def-cond">기술 조건: 리퍼러(이전 페이지) 없음 · did(유입 경로 식별 코드) 없음</div>
-          </div>
-        </div>
-        <div class="ch-def-row">
-          <div class="ch-def-dot" style="background:#D97706"></div>
-          <div>
-            <div class="ch-def-name">한국일보</div>
-            <div class="ch-def-desc">이전 방문 페이지가 hankookilbo.com인 트래픽. 사이트 내 링크 클릭·앱·<strong>뉴스레터</strong> 등 한국일보 도메인에서 넘어온 모든 경우가 해당됩니다.</div>
-            <div class="ch-def-cond">기술 조건: 리퍼러에 hankookilbo.com 포함</div>
-          </div>
-        </div>
-        <div class="ch-def-divider"></div>
-        <div class="ch-def-note">※ <strong>직접유입</strong>은 출처를 특정할 수 없는 트래픽의 집합이고, <strong>한국일보</strong>는 출처가 명확하게 자사 도메인으로 확인된 트래픽입니다.</div>
-      </div>
-      <table class="data-table" id="channelTable">
-        <thead>
-          <tr>
-            <th>채널</th>
-            <th>이번 주</th>
-            <th>전주</th>
-            <th>변화</th>
-          </tr>
-        </thead>
-        <tbody id="channelTbody">
-          <tr><td colspan="4" class="empty-state">데이터를 불러오세요</td></tr>
-        </tbody>
-      </table>
-      <div class="chart-wrap sm" style="margin-top:20px">
+      <div class="chart-wrap" style="height:280px;margin:0">
         <canvas id="channelChart" role="img" aria-label="채널별 PV 추이 차트"></canvas>
       </div>
-    </section>
-  </div>
+    </div>
+
+    <!-- 채널 정의 풀너비 -->
+    <div class="ch-def-box" style="margin-bottom:16px;display:flex;gap:32px;align-items:flex-start;flex-wrap:nowrap">
+      <div style="font-size:11px;font-weight:800;color:#64748B;white-space:nowrap;padding-top:2px">📌 채널 정의</div>
+      <div style="display:flex;gap:8px;align-items:flex-start;flex:1">
+        <div class="ch-def-dot" style="background:#1D4ED8;margin-top:3px;flex-shrink:0"></div>
+        <div style="margin-right:28px">
+          <div class="ch-def-name">직접유입</div>
+          <div class="ch-def-desc">주소창 직접 입력·북마크·<strong>카카오톡·앱 내 브라우저</strong> 등 리퍼러가 없는 트래픽.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-start;flex:1">
+        <div class="ch-def-dot" style="background:#D97706;margin-top:3px;flex-shrink:0"></div>
+        <div>
+          <div class="ch-def-name">한국일보</div>
+          <div class="ch-def-desc">이전 페이지가 hankookilbo.com인 트래픽. 사이트 내 링크·앱·<strong>뉴스레터</strong> 등.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단: 채널별 일별 PV 테이블 -->
+    <div style="border-top:1px solid #F1F5F9;padding-top:16px">
+      <div style="font-size:12px;font-weight:800;color:#0F172A;margin-bottom:10px">채널별 일별 PV</div>
+      <div style="overflow-x:auto">
+        <table class="data-table" style="font-size:11.5px" id="channelDailyTable">
+          <thead><tr id="channelDailyHead"><th style="text-align:left">채널</th></tr></thead>
+          <tbody id="channelDailyTbody">
+            <tr><td class="empty-state">데이터를 불러오세요</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
 
 
@@ -584,7 +602,12 @@ function toYMD(d) {
   const day = String(d.getDate()).padStart(2,'0');
   return `${y}${m}${day}`;
 }
-function toISO(d) { return d.toISOString().slice(0,10); }
+function toISO(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 
 function weekStart(d) {
   const r = new Date(d);
@@ -1104,6 +1127,30 @@ function renderChannels() {
       channelInsightEl.textContent = msg;
       channelInsightEl.style.display = 'block';
     }
+  }
+
+  // 채널 일별 테이블
+  const dailyHead = document.getElementById('channelDailyHead');
+  const dailyBody = document.getElementById('channelDailyTbody');
+  if (dailyHead && dailyBody) {
+    dailyHead.innerHTML = '<th style="text-align:left">채널</th>' +
+      dates.map(d => {
+        const wdi = (d.getDay()+6)%7;
+        return `<th>${WEEKDAY_KO[wdi]}<br><span style="font-size:9px;font-weight:500;color:#94A3B8">${d.getMonth()+1}/${d.getDate()}</span></th>`;
+      }).join('') + '<th style="background:#EFF6FF;color:#1D4ED8">합계</th>';
+    dailyBody.innerHTML = PORTALS.map(p => {
+      const clr = PORTAL_CLR[p] || '#64748B';
+      const cells = dates.map(d => {
+        const v = S.channels[toISO(d)]?.[p] || 0;
+        return `<td>${v ? fmtMan(v) : '<span style="color:#CBD5E1">—</span>'}</td>`;
+      }).join('');
+      const total = weeklyChannelSum(S.channels, p);
+      return `<tr>
+        <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${clr};margin-right:6px;vertical-align:middle"></span>${p}</td>
+        ${cells}
+        <td style="font-weight:800;color:#1D4ED8;background:#EFF6FF">${fmtMan(total)}</td>
+      </tr>`;
+    }).join('');
   }
 
   if (S.charts.channel) S.charts.channel.destroy();
